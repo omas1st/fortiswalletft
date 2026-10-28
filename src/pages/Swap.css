@@ -1,0 +1,47 @@
+.swap-page {
+  min-height: 100vh;
+  background: var(--bg-0);
+}
+
+.swap-body {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+}
+
+.swap-card {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  position: relative;
+}
+
+.swap-arrow {
+  display: flex;
+  justify-content: center;
+  margin: 12px 0;
+}
+
+.swap-arrow svg {
+  width: 40px;
+  height: 40px;
+  padding: 10px;
+  border-radius: 50%;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  color: var(--primary);
+  font-size: 20px;
+}
+
+.fee-note {
+  display: block;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--warning);
+  font-weight: 600;
+}
+
+.swap-body .primary-btn {
+  margin-top: 20px;
+}

@@ -1,0 +1,41 @@
+.wallet-modal {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  width: 100%;
+  max-width: 460px;
+  box-shadow: var(--shadow-lg);
+}
+
+.wallet-address {
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 16px;
+  letter-spacing: 2px;
+  color: var(--primary);
+  background: var(--bg-1);
+  padding: 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  text-align: center;
+  word-break: break-all;
+  margin-bottom: 16px;
+}
+
+.copy-btn {
+  width: 100%;
+  padding: 13px;
+  border-radius: var(--radius-sm);
+  background: var(--grad);
+  color: #0a0e17;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all var(--transition);
+}
+
+.copy-btn:hover {
+  filter: brightness(1.08);
+}

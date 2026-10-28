@@ -1,0 +1,258 @@
+.buy-page {
+  min-height: 100vh;
+  background: var(--bg-0);
+}
+
+.buy-body,
+.payment-body {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+  animation: fadeIn 0.3s ease;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 18px;
+  color: var(--text-mute);
+}
+
+.search-box input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.search-box input:focus {
+  box-shadow: none;
+}
+
+.search-box .check-btn {
+  padding: 6px 14px;
+  background: var(--grad);
+  color: #0a0e17;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.buy-asset-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 50vh;
+  overflow-y: auto;
+  padding-right: 4px;
+  margin-bottom: 18px;
+}
+
+.buy-asset {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-align: left;
+  transition: all var(--transition);
+}
+
+.buy-asset:hover {
+  border-color: var(--primary);
+}
+
+.buy-asset.selected {
+  border-color: var(--primary);
+  background: rgba(0, 212, 170, 0.06);
+  box-shadow: 0 0 0 2px rgba(0, 212, 170, 0.2);
+}
+
+.buy-asset img {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+}
+
+.buy-asset .name {
+  display: block;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.buy-asset .symbol {
+  display: block;
+  font-size: 12px;
+  color: var(--text-mute);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.buy-asset .check {
+  margin-left: auto;
+  color: var(--primary);
+  font-size: 20px;
+}
+
+.amount-box {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 16px;
+}
+
+.payment-summary {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-dim);
+}
+
+.payment-summary strong {
+  color: var(--text);
+}
+
+/* 🔧 tabs (supports locked state) */
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin: 20px 0;
+  background: var(--bg-1);
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+.tabs button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  color: var(--text-dim);
+  font-size: 14px;
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.tabs button.active {
+  background: var(--grad);
+  color: #0a0e17;
+}
+
+.tabs button.locked {
+  opacity: 0.6;
+  cursor: not-allowed;
+  color: var(--danger);
+  background: rgba(255, 77, 109, 0.08);
+}
+
+.lock-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 77, 109, 0.2);
+  color: var(--danger);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card-form {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.paypal-box {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.paypal-box p {
+  color: var(--text-dim);
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.paypal-box strong {
+  display: block;
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  color: var(--primary);
+  font-size: 15px;
+  word-break: break-all;
+}
+
+.processing-modal {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px 28px;
+  max-width: 440px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+}
+
+.processing-modal h3 {
+  font-size: 18px;
+  margin: 12px 0 10px;
+}
+
+.processing-modal p {
+  color: var(--text-dim);
+  font-size: 14px;
+  margin-bottom: 22px;
+  line-height: 1.6;
+}
+
+/* 🔧 both-locked modal */
+.locked-modal {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px 28px;
+  max-width: 440px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+}
+
+.locked-modal h3 {
+  font-size: 20px;
+  margin-bottom: 12px;
+  color: var(--danger);
+}
+
+.locked-modal p {
+  color: var(--text-dim);
+  font-size: 14px;
+  margin-bottom: 22px;
+  line-height: 1.6;
+}
+
+@media (max-width: 480px) {
+  .buy-body,
+  .payment-body {
+    padding: 20px 16px 50px;
+  }
+}

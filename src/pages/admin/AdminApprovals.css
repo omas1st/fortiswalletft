@@ -1,0 +1,63 @@
+.admin-approvals {
+  animation: fadeIn 0.3s ease;
+}
+
+.admin-approvals section {
+  margin-bottom: 32px;
+}
+
+.admin-approvals section h3 {
+  font-size: 16px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-dim);
+}
+
+.approval-card {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 14px;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.approval-info {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px 20px;
+}
+
+.approval-info p {
+  font-size: 13px;
+  color: var(--text);
+}
+
+.approval-info span {
+  color: var(--text-mute);
+  font-weight: 600;
+  display: inline-block;
+  min-width: 90px;
+}
+
+.approval-card .primary-btn {
+  width: auto;
+  padding: 10px 20px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .approval-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .approval-info {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,186 @@
+.admin-user-edit {
+  animation: fadeIn 0.3s ease;
+}
+
+.edit-card {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  margin-bottom: 20px;
+}
+
+.edit-card h3 {
+  font-size: 16px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.edit-card h4 {
+  font-size: 14px;
+  margin-top: 22px;
+  margin-bottom: 10px;
+  color: var(--text-dim);
+}
+
+.edit-hint {
+  font-size: 12px;
+  color: var(--text-mute);
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px 24px;
+}
+
+.details-grid p {
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+
+.details-grid span {
+  color: var(--text-mute);
+  font-weight: 600;
+  display: inline-block;
+  min-width: 100px;
+}
+
+.details-grid a {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.asset-edit-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.asset-edit-row {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-1);
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+.asset-symbol-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.asset-symbol-label small {
+  font-weight: 500;
+  color: var(--text-mute);
+}
+
+.asset-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.asset-input label {
+  display: block;
+  font-size: 11px;
+  color: var(--text-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 4px;
+  font-weight: 600;
+}
+
+.asset-input input {
+  padding: 8px 12px;
+  font-size: 13px;
+  width: 100%;
+}
+
+.notif-edit-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr 180px auto;
+  gap: 8px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.notif-edit-row input {
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+.save-all-notifs {
+  margin-top: 12px;
+  max-width: 260px;
+}
+
+.delete-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 77, 109, 0.12);
+  color: var(--danger);
+  border: 1px solid rgba(255, 77, 109, 0.35);
+  font-size: 16px;
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+
+.delete-btn:hover {
+  background: var(--danger);
+  color: #fff;
+  border-color: var(--danger);
+}
+
+/* 🔧 NEW: compact variant used inside table cells */
+.delete-btn.sm {
+  width: 30px;
+  height: 30px;
+  font-size: 14px;
+}
+
+.edit-card textarea {
+  min-height: 80px;
+  resize: vertical;
+  margin-bottom: 8px;
+}
+
+.edit-card .primary-btn {
+  margin-top: 12px;
+  max-width: 240px;
+}
+
+@media (max-width: 768px) {
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+  .asset-edit-row {
+    grid-template-columns: 1fr;
+  }
+  .asset-inputs {
+    grid-template-columns: 1fr;
+  }
+  .notif-edit-row {
+    grid-template-columns: 1fr;
+  }
+  .delete-btn {
+    width: 100%;
+    height: 40px;
+  }
+  .save-all-notifs {
+    max-width: none;
+  }
+}

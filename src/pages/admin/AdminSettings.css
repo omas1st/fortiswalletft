@@ -1,0 +1,210 @@
+.admin-settings {
+  animation: fadeIn 0.3s ease;
+}
+
+.admin-settings h2 {
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 20px;
+}
+
+/* Collapsible sections */
+.settings-section {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.settings-section-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  color: var(--text);
+  font-size: 15px;
+  text-align: left;
+  transition: background var(--transition);
+}
+
+.settings-section-head:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.section-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.section-title {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.section-subtitle {
+  font-size: 12px;
+  color: var(--text-mute);
+  font-weight: 400;
+}
+
+.settings-section-head svg {
+  color: var(--text-dim);
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.settings-section-body {
+  padding: 0 20px 20px;
+  border-top: 1px solid var(--border);
+}
+
+.settings-section-body .primary-btn {
+  margin-top: 14px;
+  max-width: 260px;
+}
+
+/* Asset percent rows */
+.percent-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 14px;
+}
+
+.percent-row {
+  display: grid;
+  grid-template-columns: 1fr 140px 90px;
+  align-items: center;
+  gap: 14px;
+  background: var(--bg-1);
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+.percent-row .symbol {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.percent-row input {
+  padding: 9px 12px;
+  font-size: 14px;
+}
+
+.percent-row .unit {
+  font-size: 13px;
+  color: var(--text-mute);
+  text-align: right;
+}
+
+/* PayPal section */
+.settings-section-body label {
+  margin-top: 14px;
+}
+
+.edit-hint {
+  font-size: 12px;
+  color: var(--text-mute);
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+.edit-hint strong {
+  color: var(--text);
+}
+
+/* Lock rows */
+.lock-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.lock-row:last-of-type {
+  border-bottom: none;
+}
+
+.lock-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lock-title {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.lock-desc {
+  font-size: 12px;
+  color: var(--text-mute);
+  line-height: 1.5;
+}
+
+/* Toggle switch */
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 26px;
+  flex-shrink: 0;
+  margin: 0;
+}
+
+.toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle .slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: var(--bg-3);
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  transition: all var(--transition);
+}
+
+.toggle .slider::before {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  left: 3px;
+  top: 3px;
+  background: var(--text-dim);
+  border-radius: 50%;
+  transition: all var(--transition);
+}
+
+.toggle input:checked + .slider {
+  background: var(--grad);
+  border-color: transparent;
+}
+
+.toggle input:checked + .slider::before {
+  background: #0a0e17;
+  transform: translateX(22px);
+}
+
+@media (max-width: 640px) {
+  .percent-row {
+    grid-template-columns: 1fr 1fr;
+  }
+  .percent-row .unit {
+    grid-column: span 2;
+    text-align: right;
+  }
+  .settings-section-body .primary-btn {
+    max-width: none;
+  }
+}

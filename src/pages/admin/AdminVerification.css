@@ -1,0 +1,102 @@
+.admin-verification {
+  animation: fadeIn 0.3s ease;
+}
+
+.verify-card {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  margin-bottom: 18px;
+}
+
+.verify-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.verify-head h3 {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.status {
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status.pending {
+  background: rgba(255, 183, 3, 0.12);
+  color: var(--warning);
+}
+
+.status.approved {
+  background: rgba(6, 214, 160, 0.12);
+  color: var(--success);
+}
+
+.codes-section {
+  margin-top: 16px;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+}
+
+.codes-section h4 {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+
+.submitted-code {
+  font-size: 13px;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+
+.submitted-code strong {
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  color: var(--primary);
+  font-size: 14px;
+}
+
+.code-setter {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 10px;
+  margin-top: 14px;
+  align-items: center;
+}
+
+.code-setter input {
+  padding: 10px 14px;
+  font-size: 14px;
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+}
+
+.code-setter .ghost-btn {
+  width: auto;
+  padding: 10px 18px;
+  font-size: 13px;
+}
+
+.code-setter .primary-btn {
+  width: auto;
+  padding: 10px 20px;
+  font-size: 13px;
+}
+
+@media (max-width: 640px) {
+  .code-setter {
+    grid-template-columns: 1fr;
+  }
+}

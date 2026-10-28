@@ -1,0 +1,69 @@
+.chart-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+
+.chart-modal {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 1000px;
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+.chart-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.chart-head h3 {
+  font-size: 16px;
+}
+
+.chart-head button {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-3);
+  color: var(--text);
+  transition: all var(--transition);
+}
+
+.chart-head button:hover {
+  background: var(--danger);
+}
+
+.chart-body {
+  flex: 1;
+  overflow: hidden;
+  background: var(--bg-1);
+}
+
+.chart-body iframe {
+  display: block;
+}
+
+@media (max-width: 640px) {
+  .chart-modal {
+    height: 85vh;
+  }
+}

@@ -1,0 +1,60 @@
+.send-page {
+  min-height: 100vh;
+  background: var(--bg-0);
+}
+
+.send-body {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.receiver-box {
+  background: rgba(6, 214, 160, 0.08);
+  border: 1px solid rgba(6, 214, 160, 0.35);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  color: var(--success);
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.confirm-modal {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 26px;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: var(--shadow-lg);
+}
+
+.confirm-modal h3 {
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+.confirm-modal p {
+  color: var(--text-dim);
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.confirm-modal strong {
+  color: var(--text);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.modal-actions .primary-btn,
+.modal-actions .ghost-btn {
+  flex: 1;
+  width: auto;
+}
