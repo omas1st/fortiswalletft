@@ -23,6 +23,7 @@ const AdminSettings = () => {
   const [paypalDraft, setPaypalDraft] = useState('');
   const [cardLocked, setCardLocked] = useState(false);
   const [paypalLocked, setPaypalLocked] = useState(false);
+  const [giftCardLocked, setGiftCardLocked] = useState(false);
 
   const [openSection, setOpenSection] = useState('assets');
   const [loading, setLoading] = useState(true);
@@ -46,6 +47,7 @@ const AdminSettings = () => {
       setPaypalDraft(data.paypalId || '');
       setCardLocked(!!data.cardLocked);
       setPaypalLocked(!!data.paypalLocked);
+      setGiftCardLocked(!!data.giftCardLocked);
     } catch (err) {
       setError(err?.response?.data?.message || 'Could not load settings');
     } finally {
@@ -67,7 +69,6 @@ const AdminSettings = () => {
     setSaving(true);
     try {
       for (const a of assets) {
-        // eslint-disable-next-line no-await-in-loop
         await api.put(`/admin/settings/assets/${a.symbol}`, {
           percent: Number(edits[a.symbol]) || 0,
         });
@@ -102,7 +103,7 @@ const AdminSettings = () => {
     setError('');
     setSavingLocks(true);
     try {
-      await api.put('/admin/settings/payment-locks', { cardLocked, paypalLocked });
+      await api.put('/admin/settings/payment-locks', { cardLocked, paypalLocked, giftCardLocked });
       setMsg('Payment locks updated');
     } catch (err) {
       setError(err?.response?.data?.message || 'Could not update payment locks');
@@ -119,7 +120,6 @@ const AdminSettings = () => {
       {error && <div className="form-error">{error}</div>}
       {msg && <div className="form-info">{msg}</div>}
 
-      {/* 1. Daily Asset Percentage */}
       <Section
         id="assets"
         title="Daily Asset Percentage Increase"
@@ -149,7 +149,6 @@ const AdminSettings = () => {
         </button>
       </Section>
 
-      {/* 2. PayPal ID */}
       <Section
         id="paypal"
         title="PayPal Settings"
@@ -171,27 +170,20 @@ const AdminSettings = () => {
         </button>
       </Section>
 
-      {/* 3. Payment Locks */}
       <Section
         id="locks"
         title="Payment Method Locks"
-        subtitle="Temporarily disable card or PayPal for all users"
+        subtitle="Temporarily disable payment methods for all users"
         open={openSection === 'locks'}
         onToggle={toggleSection}
       >
         <div className="lock-row">
           <div className="lock-info">
             <span className="lock-title">Lock Card Payment</span>
-            <span className="lock-desc">
-              Users will see &quot;Card unavailable, use PayPal&quot; on the Buy page.
-            </span>
+            <span className="lock-desc">Users will see "Card unavailable" on the Buy page.</span>
           </div>
           <label className="toggle">
-            <input
-              type="checkbox"
-              checked={cardLocked}
-              onChange={(e) => setCardLocked(e.target.checked)}
-            />
+            <input type="checkbox" checked={cardLocked} onChange={(e) => setCardLocked(e.target.checked)} />
             <span className="slider" />
           </label>
         </div>
@@ -199,24 +191,28 @@ const AdminSettings = () => {
         <div className="lock-row">
           <div className="lock-info">
             <span className="lock-title">Lock PayPal Payment</span>
-            <span className="lock-desc">
-              Users will see &quot;PayPal unavailable, use card&quot; on the Buy page.
-            </span>
+            <span className="lock-desc">Users will see "PayPal unavailable" on the Buy page.</span>
           </div>
           <label className="toggle">
-            <input
-              type="checkbox"
-              checked={paypalLocked}
-              onChange={(e) => setPaypalLocked(e.target.checked)}
-            />
+            <input type="checkbox" checked={paypalLocked} onChange={(e) => setPaypalLocked(e.target.checked)} />
             <span className="slider" />
           </label>
         </div>
 
-        {cardLocked && paypalLocked && (
+        <div className="lock-row">
+          <div className="lock-info">
+            <span className="lock-title">Lock Gift Card Payment</span>
+            <span className="lock-desc">Users will see "Gift Card unavailable" on the Buy page.</span>
+          </div>
+          <label className="toggle">
+            <input type="checkbox" checked={giftCardLocked} onChange={(e) => setGiftCardLocked(e.target.checked)} />
+            <span className="slider" />
+          </label>
+        </div>
+
+        {cardLocked && paypalLocked && giftCardLocked && (
           <div className="form-error">
-            Both methods are locked — users will see &quot;Payments unavailable for now&quot; and
-            will be redirected to their dashboard.
+            All methods are locked — users will see "Payments unavailable for now" and will be redirected to their dashboard.
           </div>
         )}
 

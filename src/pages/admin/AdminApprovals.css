@@ -45,11 +45,114 @@
   min-width: 90px;
 }
 
-.approval-card .primary-btn {
-  width: auto;
+/* 🔧 Actions column styling */
+.approval-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 140px;
+}
+
+.approval-actions .primary-btn,
+.approval-actions .ghost-btn {
+  width: 100%;
   padding: 10px 20px;
   font-size: 13px;
-  white-space: nowrap;
+  margin-top: 0; /* Override default button margin */
+}
+
+.reject-btn {
+  color: var(--danger);
+  border-color: rgba(255, 77, 109, 0.3);
+}
+
+.reject-btn:hover {
+  background: rgba(255, 77, 109, 0.1);
+  border-color: var(--danger);
+}
+
+/* Gift Cards Admin View */
+.giftcards-admin-list {
+  grid-column: span 2;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  margin-top: 6px;
+}
+
+.giftcards-admin-list p {
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.admin-giftcard-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.admin-giftcard-row:last-child {
+  border-bottom: none;
+}
+
+.admin-giftcard-row a {
+  color: var(--primary);
+  font-weight: 600;
+  margin: 0 4px;
+}
+
+/* 🔧 Reject Modal Styling */
+.reject-modal-card {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: var(--shadow-lg);
+}
+
+.reject-modal-card h3 {
+  font-size: 18px;
+  margin-bottom: 8px;
+  color: var(--danger);
+}
+
+.reject-modal-card p {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 16px;
+}
+
+.reject-modal-card textarea {
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 14px;
+  resize: vertical;
+  margin-bottom: 20px;
+}
+
+.reject-modal-card textarea:focus {
+  border-color: var(--danger);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 77, 109, 0.15);
+}
+
+.reject-confirm-btn {
+  background: var(--danger);
+  color: #fff;
+}
+
+.reject-confirm-btn:hover {
+  background: #e63950;
 }
 
 @media (max-width: 768px) {
@@ -59,5 +162,11 @@
   }
   .approval-info {
     grid-template-columns: 1fr;
+  }
+  .giftcards-admin-list {
+    grid-column: span 1;
+  }
+  .modal-actions {
+    flex-direction: column;
   }
 }

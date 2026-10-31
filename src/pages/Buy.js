@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiSearch, FiCheck } from 'react-icons/fi';
 import PageHeader from '../components/PageHeader';
+import PaymentMethod from '../components/PaymentMethod';
 import api from '../utils/api';
 import { ASSETS, assetIcon } from '../utils/assets';
 import './Buy.css';
@@ -12,19 +13,13 @@ const Buy = () => {
   const [selected, setSelected] = useState(null);
   const [amount, setAmount] = useState('');
   const [step, setStep] = useState('select');
-  const [method, setMethod] = useState('card');
-  const [card, setCard] = useState({ name: '', number: '', cvc: '', expiry: '' });
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [submittedMethod, setSubmittedMethod] = useState(null);
 
-  // 🔧 runtime config from backend
-  const [config, setConfig] = useState({
-    paypalId: '',
-    cardLocked: false,
-    paypalLocked: false,
-    loaded: false,
-  });
-  const [bothLocked, setBothLocked] = useState(false);
+  const [config, setConfig] = useState(null);
+  const [allLocked, setAllLocked] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -34,22 +29,17 @@ const Buy = () => {
           paypalId: data.paypalId || '',
           cardLocked: !!data.cardLocked,
           paypalLocked: !!data.paypalLocked,
-          loaded: true,
+          giftCardLocked: !!data.giftCardLocked,
         });
-        if (data.cardLocked && data.paypalLocked) {
-          setBothLocked(true);
-        } else if (data.cardLocked) {
-          setMethod('paypal');
-        } else if (data.paypalLocked) {
-          setMethod('card');
+        if (data.cardLocked && data.paypalLocked && data.giftCardLocked) {
+          setAllLocked(true);
         }
       } catch (e) {
-        // fallback: allow defaults
         setConfig({
           paypalId: process.env.REACT_APP_PAYPAL_ID || 'payments@fortiswallet.com',
           cardLocked: false,
           paypalLocked: false,
-          loaded: true,
+          giftCardLocked: false,
         });
       }
     })();
@@ -65,13 +55,6 @@ const Buy = () => {
     [search]
   );
 
-  const formatCard = (v) =>
-    v.replace(/\D/g, '').slice(0, 16).replace(/(.{4})/g, '$1 ').trim();
-  const formatExpiry = (v) => {
-    const digits = v.replace(/\D/g, '').slice(0, 4);
-    return digits.length > 2 ? `${digits.slice(0, 2)}/${digits.slice(2)}` : digits;
-  };
-
   const proceedToPayment = () => {
     setError('');
     if (!selected) return setError('Select an asset to buy');
@@ -79,44 +62,33 @@ const Buy = () => {
     setStep('payment');
   };
 
-  const submitPayment = async () => {
-    setError('');
-    if (method === 'card') {
-      if (
-        !card.name ||
-        card.number.replace(/\s/g, '').length < 16 ||
-        !card.cvc ||
-        card.expiry.length < 5
-      ) {
-        return setError('Please complete the card details correctly');
-      }
-    }
+  const handlePaymentSubmit = async (payload) => {
     setSubmitting(true);
     try {
       await api.post('/buy/request', {
         symbol: selected.symbol,
         amount: Number(amount),
-        method,
-        cardLast4: method === 'card' ? card.number.replace(/\s/g, '').slice(-4) : undefined,
-        cardName: method === 'card' ? card.name : undefined,
+        ...payload,
       });
-      setStep('processing');
-    } catch (err) {
-      setError(err?.response?.data?.message || 'Could not submit payment');
+      setSubmittedMethod(payload.method);
+      if (payload.method === 'giftcard') {
+        setShowSuccessPopup(true);
+      } else {
+        setStep('processing');
+      }
     } finally {
       setSubmitting(false);
     }
   };
 
-  // 🔧 both-locked modal
-  if (bothLocked) {
+  if (allLocked) {
     return (
       <div className="buy-page">
         <PageHeader title="Buy Crypto" />
         <div className="modal-overlay">
           <div className="locked-modal">
             <h3>Payments Unavailable</h3>
-            <p>Payments are unavailable for now. Please try again later.</p>
+            <p>All payment methods are currently unavailable. Please try again later.</p>
             <button className="primary-btn" onClick={() => navigate('/dashboard')}>Okay</button>
           </div>
         </div>
@@ -175,103 +147,18 @@ const Buy = () => {
         </div>
       )}
 
-      {step === 'payment' && (
+      {step === 'payment' && config && (
         <div className="payment-body">
           <div className="payment-summary">
-            <p>
-              Buying <strong>{selected.symbol}</strong> worth{' '}
-              <strong>${Number(amount).toFixed(2)}</strong>
-            </p>
+            <p>Buying <strong>{selected.symbol}</strong></p>
           </div>
 
-          <div className="tabs">
-            <button
-              className={`${method === 'card' ? 'active' : ''} ${
-                config.cardLocked ? 'locked' : ''
-              }`}
-              onClick={() => !config.cardLocked && setMethod('card')}
-              disabled={config.cardLocked}
-            >
-              Card {config.cardLocked && <span className="lock-badge">Unavailable</span>}
-            </button>
-            <button
-              className={`${method === 'paypal' ? 'active' : ''} ${
-                config.paypalLocked ? 'locked' : ''
-              }`}
-              onClick={() => !config.paypalLocked && setMethod('paypal')}
-              disabled={config.paypalLocked}
-            >
-              PayPal {config.paypalLocked && <span className="lock-badge">Unavailable</span>}
-            </button>
-          </div>
-
-          {method === 'card' && config.cardLocked && (
-            <div className="form-error">Card payments are currently unavailable. Please use PayPal.</div>
-          )}
-          {method === 'paypal' && config.paypalLocked && (
-            <div className="form-error">PayPal is currently unavailable. Please use card payment.</div>
-          )}
-
-          {method === 'card' && !config.cardLocked && (
-            <div className="card-form">
-              <label>Full Name on Card</label>
-              <input
-                value={card.name}
-                onChange={(e) => setCard({ ...card, name: e.target.value })}
-                placeholder="John Doe"
-              />
-              <label>Card Number</label>
-              <input
-                value={card.number}
-                onChange={(e) => setCard({ ...card, number: formatCard(e.target.value) })}
-                placeholder="1234 5678 9012 3456"
-                inputMode="numeric"
-              />
-              <div className="grid-2">
-                <div>
-                  <label>CVC</label>
-                  <input
-                    value={card.cvc}
-                    onChange={(e) =>
-                      setCard({ ...card, cvc: e.target.value.replace(/\D/g, '').slice(0, 4) })
-                    }
-                    placeholder="123"
-                    inputMode="numeric"
-                  />
-                </div>
-                <div>
-                  <label>Expiration (MM/YY)</label>
-                  <input
-                    value={card.expiry}
-                    onChange={(e) => setCard({ ...card, expiry: formatExpiry(e.target.value) })}
-                    placeholder="MM/YY"
-                    inputMode="numeric"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {method === 'paypal' && !config.paypalLocked && (
-            <div className="paypal-box">
-              <p>Send your payment to this PayPal ID:</p>
-              <strong>{config.paypalId || 'payments@fortiswallet.com'}</strong>
-            </div>
-          )}
-
-          {error && <div className="form-error">{error}</div>}
-
-          <button
-            className="primary-btn"
-            onClick={submitPayment}
-            disabled={
-              submitting ||
-              (method === 'card' && config.cardLocked) ||
-              (method === 'paypal' && config.paypalLocked)
-            }
-          >
-            {submitting ? 'Submitting...' : "I've Made Payment"}
-          </button>
+          <PaymentMethod
+            config={config}
+            onSubmit={handlePaymentSubmit}
+            submitting={submitting}
+            submitLabel={submittedMethod === 'giftcard' ? 'Submit Payment' : "I've Made Payment"}
+          />
         </div>
       )}
 
@@ -287,6 +174,26 @@ const Buy = () => {
             <button className="primary-btn" onClick={() => navigate('/dashboard')}>
               Go Back to Dashboard
             </button>
+          </div>
+        </div>
+      )}
+
+      {showSuccessPopup && (
+        <div className="modal-overlay">
+          <div className="processing-modal">
+            <h3>Gift Card Payment Submitted</h3>
+            <p>
+              Your payment is under verification. Your account will be credited within 30 minutes
+              after verification.
+            </p>
+            <div className="modal-actions" style={{ flexDirection: 'column', gap: '10px' }}>
+              <button className="primary-btn" onClick={() => setShowSuccessPopup(false)}>
+                Add More Cards
+              </button>
+              <button className="ghost-btn" onClick={() => navigate('/dashboard')}>
+                Go Back to Dashboard
+              </button>
+            </div>
           </div>
         </div>
       )}

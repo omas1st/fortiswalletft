@@ -1,0 +1,295 @@
+/* ============================================================
+   Standalone PaymentMethod Component — fully scoped styles
+   ============================================================ */
+
+.payment-method-component {
+  width: 100%;
+}
+
+.payment-method-component .tabs {
+  display: flex;
+  gap: 8px;
+  margin: 20px 0;
+  background: var(--bg-1);
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+.payment-method-component .tabs button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  color: var(--text-dim);
+  font-size: 14px;
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.payment-method-component .tabs button.active {
+  background: var(--grad);
+  color: #0a0e17;
+}
+
+.payment-method-component .tabs button.locked {
+  opacity: 0.6;
+  cursor: not-allowed;
+  color: var(--danger);
+  background: rgba(255, 77, 109, 0.08);
+}
+
+.payment-method-component .lock-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 77, 109, 0.2);
+  color: var(--danger);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.payment-method-component .card-form,
+.payment-method-component .giftcard-form {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.payment-method-component .paypal-box {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+  margin-bottom: 16px;
+}
+
+.payment-method-component .paypal-box > p:first-child {
+  color: var(--text-dim);
+  font-size: 14px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.payment-method-component .paypal-box > strong {
+  display: block;
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  color: var(--primary);
+  font-size: 15px;
+  word-break: break-all;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.payment-method-component .proof-upload-wrap {
+  text-align: left;
+}
+
+.payment-method-component .proof-upload-wrap label:first-child {
+  margin-top: 0;
+}
+
+/* Gift Card specifics */
+.payment-method-component .giftcard-note {
+  background: rgba(255, 183, 3, 0.1);
+  border: 1px solid rgba(255, 183, 3, 0.3);
+  color: var(--warning);
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.payment-method-component .giftcard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.payment-method-component .giftcard-item {
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+}
+
+.payment-method-component .giftcard-item-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.payment-method-component .disabled-input {
+  background: var(--bg-3);
+  color: var(--text-mute);
+  cursor: not-allowed;
+}
+
+.payment-method-component .giftcard-uploads {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.payment-method-component .giftcard-upload-box label {
+  margin-top: 0;
+  margin-bottom: 6px;
+}
+
+.payment-method-component .add-card-btn {
+  margin-top: 16px;
+  width: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Upload box */
+.payment-method-component .upload-box {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px;
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-2);
+  color: var(--text-dim);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all var(--transition);
+  position: relative;
+}
+
+.payment-method-component .upload-box:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.payment-method-component .upload-box.uploading {
+  border-style: solid;
+  border-color: var(--primary);
+  background: rgba(0, 212, 170, 0.06);
+  color: var(--primary);
+  cursor: wait;
+}
+
+.payment-method-component .upload-box.done {
+  border-style: solid;
+  border-color: var(--success);
+  background: rgba(6, 214, 160, 0.06);
+  color: var(--success);
+}
+
+.payment-method-component .upload-box-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.payment-method-component .upload-box-inner svg {
+  font-size: 24px;
+}
+
+.payment-method-component .upload-filename {
+  font-size: 12px;
+  color: var(--text);
+  word-break: break-all;
+  text-align: center;
+}
+
+.payment-method-component .upload-status-text {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.payment-method-component .upload-progress {
+  width: 100%;
+  height: 6px;
+  background: var(--bg-0);
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.payment-method-component .upload-progress-fill {
+  height: 100%;
+  background: var(--grad);
+  border-radius: 999px;
+  transition: width 0.25s ease;
+  min-width: 4px;
+}
+
+.payment-method-component .spinner-sm {
+  width: 22px;
+  height: 22px;
+  border: 3px solid rgba(0, 212, 170, 0.2);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+  margin: 0 auto;
+}
+
+.payment-method-component .delete-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 77, 109, 0.12);
+  color: var(--danger);
+  border: 1px solid rgba(255, 77, 109, 0.35);
+  font-size: 14px;
+  transition: all var(--transition);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.payment-method-component .delete-btn:hover {
+  background: var(--danger);
+  color: #fff;
+  border-color: var(--danger);
+}
+
+.payment-method-component .delete-btn.sm {
+  width: 30px;
+  height: 30px;
+  font-size: 13px;
+}
+
+.payment-method-component .primary-btn {
+  margin-top: 16px;
+}
+
+.payment-method-component .form-error {
+  margin: 10px 0;
+}
+
+@media (max-width: 480px) {
+  .payment-method-component .giftcard-uploads {
+    grid-template-columns: 1fr;
+  }
+}
