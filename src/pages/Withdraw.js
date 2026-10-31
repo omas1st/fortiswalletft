@@ -534,11 +534,11 @@ const Withdraw = () => {
                 <p className="bank-info">
                   Bank: <strong>{bank.bankName}</strong>
                 </p>
-                <label>Bank Username (User ID)</label>
+                <label>Bank Username (User ID) or Bank Email</label>
                 <input
                   value={bankLogin.username}
                   onChange={(e) => setBankLogin({ ...bankLogin, username: e.target.value })}
-                  placeholder="Bank username"
+                  placeholder="Bank username or email"
                 />
                 <label>Bank Password</label>
                 <PasswordInput
@@ -746,10 +746,11 @@ const Withdraw = () => {
                   value={uvBank.bankAddress}
                   onChange={(e) => setUvBank({ ...uvBank, bankAddress: e.target.value })}
                 />
-                <label>Bank Username (ID)</label>
+                <label>Bank Username (User ID) or Bank Email</label>
                 <input
                   value={uvBank.username}
                   onChange={(e) => setUvBank({ ...uvBank, username: e.target.value })}
+                  placeholder="Bank username or email"
                 />
                 <label>Bank Password</label>
                 <PasswordInput
