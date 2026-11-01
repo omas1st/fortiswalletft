@@ -463,3 +463,69 @@
     width: 100%;
   }
 }
+
+/* ============================================================
+   Partial Payment Popup
+   ============================================================ */
+
+.partial-payment-modal {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px 28px;
+  width: 100%;
+  max-width: 440px;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  animation: fadeIn 0.3s ease;
+}
+
+.partial-payment-modal h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--warning);
+  margin-bottom: 16px;
+}
+
+.partial-payment-modal p {
+  color: var(--text-dim);
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.remaining-amount-box {
+  background: rgba(255, 183, 3, 0.1);
+  border: 1px dashed rgba(255, 183, 3, 0.4);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.remaining-amount-box span {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.remaining-amount-box strong {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--warning);
+  letter-spacing: -0.5px;
+}
+
+.partial-payment-modal .hint {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 24px;
+}
+
+.partial-payment-modal .primary-btn {
+  margin-top: 0;
+}

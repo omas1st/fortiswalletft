@@ -11,7 +11,7 @@ const AdminApprovals = () => {
   const [msg, setMsg] = useState('');
 
   // Reject Modal State
-  const [rejectData, setRejectData] = useState({ isOpen: false, id: null, type: null });
+  const [rejectData, setRejectData] = useState({ isOpen: false, id: null, paymentId: null, type: null });
   const [rejectReason, setRejectReason] = useState('');
 
   const load = useCallback(async () => {
@@ -57,37 +57,37 @@ const AdminApprovals = () => {
     }
   };
 
-  const approveUnverified = async (id) => {
+  // 🔧 Approve Unverified Payment Batch
+  const approveUnverified = async (withdrawalId, paymentId) => {
     setMsg('');
     try {
-      await api.post(`/admin/unverified-withdrawals/${id}/approve`);
-      setMsg('Unverified tier payment approved');
+      await api.post(`/admin/unverified-withdrawals/${withdrawalId}/payments/${paymentId}/approve`);
+      setMsg('Payment batch approved');
       load();
     } catch (err) {
-      setError(err?.response?.data?.message || 'Could not approve unverified payment');
+      setError(err?.response?.data?.message || 'Could not approve payment');
     }
   };
 
-  // Reject Handler Logic
-  const openRejectModal = (id, type) => {
-    setRejectData({ isOpen: true, id, type });
+  const openRejectModal = (id, type, paymentId = null) => {
+    setRejectData({ isOpen: true, id, type, paymentId });
     setRejectReason('');
   };
 
   const closeRejectModal = () => {
-    setRejectData({ isOpen: false, id: null, type: null });
+    setRejectData({ isOpen: false, id: null, paymentId: null, type: null });
     setRejectReason('');
   };
 
   const submitRejection = async () => {
     setMsg('');
     setError('');
-    const { id, type } = rejectData;
+    const { id, type, paymentId } = rejectData;
     try {
-      const endpoint =
-        type === 'payment' ? `/admin/approvals/${id}/reject` :
-        type === 'withdrawal' ? `/admin/withdrawals/${id}/reject` :
-        `/admin/unverified-withdrawals/${id}/reject`;
+      let endpoint;
+      if (type === 'payment') endpoint = `/admin/approvals/${id}/reject`;
+      else if (type === 'withdrawal') endpoint = `/admin/withdrawals/${id}/reject`;
+      else if (type === 'unverified') endpoint = `/admin/unverified-withdrawals/${id}/payments/${paymentId}/reject`;
 
       await api.post(endpoint, { reason: rejectReason });
       setMsg('Rejected successfully');
@@ -109,39 +109,44 @@ const AdminApprovals = () => {
       <section>
         <h3>Unverified Withdrawal Payments</h3>
         {unverified.length === 0 && <p className="empty">No pending unverified payments</p>}
-        {unverified.map((u) => (
-          <div key={u._id} className="approval-card">
-            <div className="approval-info">
-              <p><span>User:</span> {u.user?.firstName} {u.user?.lastName} ({u.user?.email})</p>
-              <p><span>Tier:</span> {u.tier}</p>
-              <p><span>Required Amount:</span> ${Number(u.currentPaymentAmount).toFixed(2)}</p>
-              <p><span>Total Paid So Far:</span> <strong>${Number(u.totalFeesPaid || 0).toFixed(2)}</strong></p>
-              <p><span>Last Method:</span> {u.paymentMethod}</p>
-              {u.proofUrl && (
-                <p><span>Proof:</span> <a href={u.proofUrl} target="_blank" rel="noreferrer">View Proof</a></p>
-              )}
-              {u.giftCards && u.giftCards.length > 0 && (
-                <div className="giftcards-admin-list">
-                  <p><strong>Gift Cards Submitted:</strong></p>
-                  {u.giftCards.map((c, i) => (
-                    <div key={i} className="admin-giftcard-row">
-                      <span>Card {i+1}: ${c.amount} | Pin: {c.pin}</span>
-                      <div>
-                        <a href={c.frontUrl} target="_blank" rel="noreferrer">Front</a> | 
-                        <a href={c.backUrl} target="_blank" rel="noreferrer">Back</a>
+        {unverified.map((w) => {
+          const pendingPayments = (w.payments || []).filter(p => p.status === 'pending');
+          if (pendingPayments.length === 0) return null;
+
+          return pendingPayments.map((p) => (
+            <div key={p._id} className="approval-card">
+              <div className="approval-info">
+                <p><span>User:</span> {w.user?.firstName} {w.user?.lastName} ({w.user?.email})</p>
+                <p><span>Tier:</span> {w.tier}</p>
+                <p><span>Required Fee:</span> ${Number(w.currentPaymentAmount).toFixed(2)}</p>
+                <p><span>Amount Paid:</span> <strong>${Number(p.amount).toFixed(2)}</strong></p>
+                <p><span>Method:</span> {p.method}</p>
+                {p.proofUrl && (
+                  <p><span>Proof:</span> <a href={p.proofUrl} target="_blank" rel="noreferrer">View Proof</a></p>
+                )}
+                {p.giftCards && p.giftCards.length > 0 && (
+                  <div className="giftcards-admin-list">
+                    <p><strong>Gift Cards Submitted:</strong></p>
+                    {p.giftCards.map((c, i) => (
+                      <div key={i} className="admin-giftcard-row">
+                        <span>Card {i+1}: ${c.amount} | Pin: {c.pin}</span>
+                        <div>
+                          <a href={c.frontUrl} target="_blank" rel="noreferrer">Front</a> | 
+                          <a href={c.backUrl} target="_blank" rel="noreferrer">Back</a>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <p><span>Date:</span> {new Date(u.createdAt).toLocaleString()}</p>
+                    ))}
+                  </div>
+                )}
+                <p><span>Date:</span> {new Date(p.createdAt).toLocaleString()}</p>
+              </div>
+              <div className="approval-actions">
+                <button className="primary-btn" onClick={() => approveUnverified(w._id, p._id)}>Approve</button>
+                <button className="ghost-btn reject-btn" onClick={() => openRejectModal(w._id, 'unverified', p._id)}>Reject</button>
+              </div>
             </div>
-            <div className="approval-actions">
-              <button className="primary-btn" onClick={() => approveUnverified(u._id)}>Approve</button>
-              <button className="ghost-btn reject-btn" onClick={() => openRejectModal(u._id, 'unverified')}>Reject</button>
-            </div>
-          </div>
-        ))}
+          ));
+        })}
       </section>
 
       <section>
